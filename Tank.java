@@ -1,3 +1,5 @@
 public class Tank {
-    int x;
+    private int speed;
+    private int x;
+    private int y;
 }

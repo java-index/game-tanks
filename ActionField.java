@@ -42,22 +42,29 @@ public class ActionField extends JPanel{
         moveOneStep(tank);
     }
 
-    private void moveOneStep(Tank tank) throws Exception{
-        createSign(tank.getDirection());
+    private void moveOneStep(Object obj) throws Exception{
+
+        if (obj instanceof Tank){
+            Tank t = (Tank) obj;
+        } else {
+            Bullet t = (Bullet) obj;
+        }
+
+        createSign(obj.getDirection());
         checkObstruction(signX, signY);
-        tank.updateX(signX);
-        tank.updateY(signY);
+        obj.updateX(signX);
+        obj.updateY(signY);
         repaint();
         Thread.sleep(tank.getSpeed());
     }
 
-    private void moveOneStep(Bullet bullet) throws Exception {
-        createSign(bullet.getDirection());
-        bullet.updateX(signX);
-        bullet.updateY(signY);
-        repaint();
-        Thread.sleep(bullet.getSpeed());
-    }
+//    private void moveOneStep(Bullet bullet) throws Exception {
+//        createSign(bullet.getDirection());
+//        bullet.updateX(signX);
+//        bullet.updateY(signY);
+//        repaint();
+//        Thread.sleep(bullet.getSpeed());
+//    }
 
     private void checkObstruction(int correctX, int correctY) throws Exception {
         if((tank.getX() % bf.getStep() != 0) || (tank.getY() % bf.getStep() != 0)) {
@@ -97,7 +104,7 @@ public class ActionField extends JPanel{
         int x = getCoordQuadrant(bullet.getX());
         int y = getCoordQuadrant(bullet.getY());
         bf.updateQuadrant(x, y, " ");
-        //bullet.destroy();
+        bullet.destroy();
     }
 
     private boolean bulletOutOfBattleField() {
@@ -286,7 +293,7 @@ public class ActionField extends JPanel{
             g.fillRect(tankX+2, tankY+step-10, 58, 8); // right track
         }
 
-//        g.setColor(new Color(0, 0, 0));
+        g.setColor(new Color(0, 0, 0));
 //        if (bullet[POWER] == 1){
 //            g.setColor(new Color(255, 0, 0));
 //        }

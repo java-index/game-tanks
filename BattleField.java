@@ -7,6 +7,7 @@ public class BattleField {
     private final int gtyQuadrantY = 9;
     private final int step = 64;
     private final int BF_WIDTH = gtyQuadrantX * step;
+
     private final int BF_HEIGHT = gtyQuadrantY * step;
 
     String[][] battleField = null;
@@ -20,12 +21,12 @@ public class BattleField {
         battleField[y][x] = value;
     }
 
-    public int getStep() {
-        return step;
-    }
-
     int getDimentionX (){
         return gtyQuadrantX;
+    }
+
+    public int getStep() {
+        return step;
     }
 
     int getDimentionY(){

@@ -2,7 +2,7 @@ public class Bullet {
     private int speed = 2;
     private int x;
     private int y;
-    private int direction;
+    private Direction bulletDirection;
 
     public int getX() {
         return x;
@@ -25,17 +25,17 @@ public class Bullet {
         y = -100;
     }
 
-    public Bullet(int x, int y, int direction){
+    public Bullet(int x, int y, Direction bulletDirection){
         this.x = x;
         this.y = y;
-        this.direction = direction;
+        this.bulletDirection = bulletDirection;
     }
 
     public int getSpeed() {
         return speed;
     }
 
-    public int getDirection() {
-        return direction;
+    public Direction getDirection() {
+        return bulletDirection;
     }
 }

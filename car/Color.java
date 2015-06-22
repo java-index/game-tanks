@@ -1,0 +1,7 @@
+package car;
+
+public enum Color {
+    BLACK, BROWN, GRAY, BLUE, GREEN, RED, YELLOW,
+    WHITE, LIGHT_BLUE, LIGHT_GREEN, MAGENTA, PURPLE,
+    VIOLET, ORANGE, DARK_RED;
+}

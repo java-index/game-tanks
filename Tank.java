@@ -1,20 +1,16 @@
+import java.util.Random;
+
 public class Tank {
-    private int speed = 6;
+    protected int speed = 6;
     private int x;
     private int y;
-    private int direction;
+    private Direction tankDirection;
 
     private ActionField af;
     private BattleField bf;
 
-    /* directions of motions */
-    private final int UP = 0;
-    private final int DOWN = 1;
-    private final int LEFT = 2;
-    private final int RIGHT = 3;
-
-    public int getDirection() {
-        return direction;
+    public Direction getDirection() {
+        return tankDirection;
     }
 
     public int getSpeed() {
@@ -29,8 +25,8 @@ public class Tank {
         return y;
     }
 
-    public void setDirection(int direction) throws Exception {
-        this.direction = direction;
+    public void setDirection(Direction tankDirection) throws Exception {
+        this.tankDirection = tankDirection;
         af.processTurn(this);
     }
 
@@ -54,33 +50,86 @@ public class Tank {
         this.y += y;
     }
 
-    public void turn(int direction) throws Exception {
-        this.direction = direction;
+    public void turn(Direction tankDirection) throws Exception {
+        this.tankDirection = tankDirection;
         af.processTurn(this);
     }
 
     public void move() throws Exception {
-        System.out.println("move");
         af.processMove(this);
     }
 
     public void fire()throws Exception {
-        Bullet bullet = new Bullet(x + 27, y + 27, direction);
+        Bullet bullet = new Bullet(x + 27, y + 27, tankDirection);
         af.processFire(bullet);
     }
 
-    public void moveRandom() {
+    void moveToQuadrantXY(int xQuad, int yQuad) throws Exception {
+        int newX = af.getCoordPixel(xQuad);
+        int newY = af.getCoordPixel(yQuad);
 
+        while (!tankAtNewCoordinate(newX, newY)) {
+            Direction newDirection = defineDirection(newX, newY);
+            setDirection(newDirection);
+            af.processMove(this);
+        }
     }
 
-    public void moveToQuadrant(int x, int y) {
+    private Direction defineDirection(int newX, int newY) {
+        Direction newDirection = Direction.NONE;
 
+        if (newX > this.x) {
+            newDirection = Direction.RIGHT;
+        }
+        if (newX < this.x) {
+            newDirection = Direction.LEFT;
+        }
+        if (newY > this.y) {
+            newDirection = Direction.DOWN;
+        }
+        if (newY < this.y) {
+            newDirection = Direction.UP;
+        }
+        return newDirection;
     }
 
-    public Tank(int x, int y, int direction, BattleField bf, ActionField af){
+    boolean tankAtNewCoordinate(int newX, int newY){
+        if (this.x == newX && this.y == newY){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void destroy(){
+        x = -100;
+        y = -100;
+    }
+
+    public void randomClean() throws Exception {
+        Random rand = new Random();
+        for (int y = 0; y < bf.getDimentionY(); y++) { // y
+            int x = rand.nextInt(bf.getDimentionX()); // quadrat x 0-8
+            if (bf.scanQuadrant(x, y).equals(" ")) {
+                continue;
+            } else {
+                moveToQuadrantXY(x, y);
+            } // if
+        }// for y
+    }
+
+        public Tank(int x, int y, Direction tankDirection, BattleField bf, ActionField af){
         this.x = x;
         this.y = y;
-        this.direction = direction;
+        this.tankDirection = tankDirection;
+        this.bf = bf;
+        this.af = af;
+    }
+
+    public Tank(BattleField bf, ActionField af){
+//        this.x = x;
+//        this.y = y;
+//        this.tankDirection = tankDirection;
         this.bf = bf;
         this.af = af;
     }

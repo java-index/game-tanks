@@ -60,9 +60,9 @@ public class BattleField {
         } // for y
     }
 
-    public String getEmptyQuadrant(){
-
-    }
+//    public String getEmptyQuadrant(){
+//
+//    }
 
     public BattleField(){
         initialArrayBF();

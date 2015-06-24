@@ -25,6 +25,7 @@ public class Bullet implements Drawable {
     public void destroy(){
         x = -100;
         y = -100;
+        System.out.println("destoy");
     }
 
     public Bullet(int x, int y, Direction bulletDirection){
@@ -45,5 +46,6 @@ public class Bullet implements Drawable {
     public void paintComponent(Graphics g) {
         g.setColor(new Color(255, 0, 52));
         g.fillOval(this.x, this.y, 10, 10);
+        System.out.println("x = " + x + " y = " + y);
     }
 }

@@ -1,13 +1,13 @@
 import java.util.Random;
 
-public class Tank {
-    protected int speed = 6;
-    private int x;
-    private int y;
-    private Direction tankDirection;
+public abstract class AbstractTank implements Drawable {
+    protected int speed = 10;
+    protected int x;
+    protected int y;
+    protected Direction tankDirection;
 
-    private ActionField af;
-    private BattleField bf;
+    protected ActionField af;
+    protected BattleField bf;
 
     public Direction getDirection() {
         return tankDirection;
@@ -118,7 +118,7 @@ public class Tank {
         }// for y
     }
 
-        public Tank(int x, int y, Direction tankDirection, BattleField bf, ActionField af){
+        public AbstractTank(int x, int y, Direction tankDirection, BattleField bf, ActionField af){
         this.x = x;
         this.y = y;
         this.tankDirection = tankDirection;
@@ -126,10 +126,7 @@ public class Tank {
         this.af = af;
     }
 
-    public Tank(BattleField bf, ActionField af){
-//        this.x = x;
-//        this.y = y;
-//        this.tankDirection = tankDirection;
+    public AbstractTank(BattleField bf, ActionField af){
         this.bf = bf;
         this.af = af;
     }

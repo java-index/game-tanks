@@ -1,5 +1,7 @@
-public class Bullet {
-    private int speed = 2;
+import java.awt.*;
+
+public class Bullet implements Drawable {
+    private int speed = 5;
     private int x;
     private int y;
     private Direction bulletDirection;
@@ -37,5 +39,11 @@ public class Bullet {
 
     public Direction getDirection() {
         return bulletDirection;
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        g.setColor(new Color(255, 0, 52));
+        g.fillOval(this.x, this.y, 10, 10);
     }
 }

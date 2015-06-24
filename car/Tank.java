@@ -31,11 +31,11 @@ public class Tank {
     }
 
     public void turn(){
-        System.out.println("Tank turned");
+        System.out.println("AbstractTank turned");
     }
 
     public void move(){
-        System.out.println("Tank move");
+        System.out.println("AbstractTank move");
     }
 
     public static void main(String[] args) {

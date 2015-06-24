@@ -12,7 +12,7 @@ public class ActionField extends JPanel {
     private Bullet bullet;
     private AbstractTank deffender;
     private AbstractTank agressor;
-    Drawable[] drawComponents;
+
     private int signX = 0;
     private int signY = 0;
 
@@ -134,7 +134,7 @@ public class ActionField extends JPanel {
         bullet = new Bullet(-100, -100, Direction.DOWN);
         deffender = new T34(0, 0, Direction.DOWN, bf, this);
         agressor = new Tiger(512, 512, Direction.DOWN, bf, this);
-        drawComponents = new Drawable[]{bf, deffender, agressor, bullet};
+
         JFrame frame;
         frame = new JFrame("** WORD OF TANKS **");
         frame.setLocation(500, 150);
@@ -148,8 +148,9 @@ public class ActionField extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (Drawable component : drawComponents) {
-            component.paintComponent(g);
-        }
+        bf.paintComponent(g);
+        bullet.paintComponent(g);
+        deffender.paintComponent(g);
+        agressor.paintComponent(g);
     }
 }

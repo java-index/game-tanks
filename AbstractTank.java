@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.util.Random;
 
-public abstract class AbstractTank implements Drawable {
+public abstract class AbstractTank implements Drawable, Destroyable {
     protected int speed = 10;
     protected int x;
     protected int y;
@@ -26,15 +26,6 @@ public abstract class AbstractTank implements Drawable {
         return y;
     }
 
-    public void setDirection(Direction tankDirection) throws Exception {
-        this.tankDirection = tankDirection;
-        af.processTurn(this);
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
     public void setX(int x) {
         this.x = x;
     }
@@ -49,6 +40,15 @@ public abstract class AbstractTank implements Drawable {
 
     public void updateY(int y){
         this.y += y;
+    }
+
+    public void setDirection(Direction tankDirection) throws Exception {
+        this.tankDirection = tankDirection;
+        af.processTurn(this);
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public void turn(Direction tankDirection) throws Exception {
@@ -102,6 +102,7 @@ public abstract class AbstractTank implements Drawable {
         }
     }
 
+    @Override
     public void destroy(){
         x = -100;
         y = -100;
@@ -138,7 +139,7 @@ public abstract class AbstractTank implements Drawable {
         int tankY = y;
         g.setColor(new Color(70, 70, 70));
         g.fillRect(tankX+10, tankY+10, 44, 44);
-        g.setColor(new Color(130, 130, 130));
+        g.setColor(new Color(0, 130, 24));
         g.fillOval(tankX+15, tankY+15, 34, 34);
 
         if (tankDirection == Direction.UP) {

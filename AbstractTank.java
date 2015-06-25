@@ -139,7 +139,7 @@ public abstract class AbstractTank implements Drawable, Destroyable {
         int tankY = y;
         g.setColor(new Color(70, 70, 70));
         g.fillRect(tankX+10, tankY+10, 44, 44);
-        g.setColor(new Color(0, 130, 24));
+        g.setColor(new Color(130, 130, 130));
         g.fillOval(tankX+15, tankY+15, 34, 34);
 
         if (tankDirection == Direction.UP) {

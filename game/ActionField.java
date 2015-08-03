@@ -184,7 +184,7 @@ public class ActionField extends JPanel {
         frame.setLocation(500, 150);
         frame.setMinimumSize(new Dimension(576, 576 + 22));
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setBackground(Color.ORANGE);
+        this.setBackground(new Color(255, 246, 192));
         frame.getContentPane().add(BorderLayout.CENTER, this);
         frame.pack();
         frame.setVisible(true);

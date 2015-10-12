@@ -1,6 +1,5 @@
 package game;
 
-import com.sun.deploy.panel.SpecialTableRenderer;
 import game.bf_objects.*;
 import game.bf_objects.tanks.*;
 import game.bf_objects.tanks.Action;
@@ -9,11 +8,13 @@ import game.view.StartGamePanel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
 public class ActionField extends JPanel {
+
+    private boolean pause;
 
     private BattleField bf;
     private Bullet bullet;
@@ -23,7 +24,7 @@ public class ActionField extends JPanel {
     private JPanel cards;
     private JPanel endGame;
     private JPanel startGame;
-    private JFrame mainFrame;
+    private MainFrame mainFrame;
 
     final static String BF_PANEL = "BF_PANEL";
     final static String START_PANEL = "START_PANEL";
@@ -31,14 +32,7 @@ public class ActionField extends JPanel {
     private int signX = 0;
     private int signY = 0;
 
-    public void runTheGame() throws Exception {
-        while (true) {
-            processAction(deffender.setUp(), deffender);
-            processAction(agressor.setUp(), agressor);
-        }
-    }
-
-    private void processAction(Action a, Tank tank) throws Exception {
+    private void processAction(Action a, Tank tank) {
         if (a == Action.MOVE) {
             processMove(tank);
         } else if (a == Action.FIRE) {
@@ -46,25 +40,25 @@ public class ActionField extends JPanel {
         }
     }
 
-    public void processMove(Tank tank) throws Exception {
+    public void processMove(Tank tank) {
         moveOneStep(tank);
     }
 
-    private void moveOneStep(Tank tank) throws Exception {
+    private void moveOneStep(Tank tank) {
         createSign(tank.getDirection());
         checkInterception(tank, signX, signY);
         tank.updateX(signX);
         tank.updateY(signY);
         repaint();
-        Thread.sleep(tank.getSpeed());
+        sleep(tank.getSpeed());
     }
 
-    private void moveOneStep(Bullet bullet) throws Exception {
+    private void moveOneStep(Bullet bullet) {
         createSign(bullet.getDirection());
         bullet.updateX(signX);
         bullet.updateY(signY);
         repaint();
-        Thread.sleep(bullet.getSpeed());
+        sleep(bullet.getSpeed());
     }
 
     private void createSign(Direction direction) {
@@ -74,7 +68,7 @@ public class ActionField extends JPanel {
         signY = mask[0] + mask[1]; // y (-1 or 0 or +1)
     }
 
-    private void checkInterception(Tank tank, int correctX, int correctY) throws Exception {
+    private void checkInterception(Tank tank, int correctX, int correctY) {
         if ((tank.getX() % bf.getStep() != 0) || (tank.getY() % bf.getStep() != 0)) {
             return;
         }
@@ -90,7 +84,7 @@ public class ActionField extends JPanel {
         repaint();
     }
 
-    public void processFire(Bullet bullet, Tank bulletOwner) throws Exception {
+    public void processFire(Bullet bullet, Tank bulletOwner) {
         this.bullet = bullet;
         this.bullet.setOwner(bulletOwner);
         while (!bulletOutOfBattleField()) {
@@ -179,6 +173,57 @@ public class ActionField extends JPanel {
         return (tank.getX() == newX && tank.getY() == newY);
     }
 
+    /***** change panels ******/
+
+    private void selectActivePanel(String activePanel){
+        CardLayout cl = (CardLayout)cards.getLayout();
+        cl.show(cards, activePanel);
+    }
+    private void setActiveBFpanel(boolean active){
+
+    }
+
+    private void setStartGamePanel(boolean active){
+
+    }
+
+    private void startGame() {
+        System.out.println("start");
+
+        selectActivePanel(BF_PANEL);
+
+        while (true) {
+            if (pause) {
+                sleep(500);
+                continue;
+            }
+            processAction(deffender.setUp(), deffender);
+            processAction(agressor.setUp(), agressor);
+        }
+    }
+
+    private void stopGame(){
+        System.out.println("stop");
+    }
+
+    private void pauseGame(){
+        System.out.println("pause");
+    }
+
+    private void exitGame(){
+        System.exit(0);
+    }
+
+    private void sleep(int time){
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("sleep interrupted");
+        }
+    }
+
+    /***** init section *****/
+
     public ActionField() throws Exception {
         renderSplashScreen();
         initBFObjects();
@@ -195,12 +240,14 @@ public class ActionField extends JPanel {
 
     private void initViews() {
         this.cards = new JPanel(new CardLayout());
-        this.cards.add(this, BF_PANEL);
         this.cards.add(new StartGamePanel(), START_PANEL);
+        this.cards.add(this, BF_PANEL);
     }
 
     void initFrame(){
-        mainFrame = new MainFrame(cards);
+        mainFrame = new MainFrame();
+        mainFrame.addFrameMenuListener(new menuFrameListener());
+        mainFrame.setContentPane(cards);
     }
 
     void renderSplashScreen() throws NullPointerException{
@@ -217,5 +264,24 @@ public class ActionField extends JPanel {
         deffender.draw(g);
         agressor.draw(g);
         bullet.draw(g);
+    }
+
+    class menuFrameListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            switch (e.getActionCommand()){
+                case ("start"):
+                    startGame();
+                    break;
+                case ("stop"):
+                    stopGame();
+                    break;
+                case ("pause"):
+                    pauseGame();
+                    break;
+                case ("quit"):
+                    exitGame();
+            }
+        }
     }
 }

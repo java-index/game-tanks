@@ -23,6 +23,7 @@ public class ActionField extends JPanel {
     private JPanel cards;
     private JPanel endGame;
     private JPanel startGame;
+    private JFrame mainFrame;
 
     final static String BF_PANEL = "BF_PANEL";
     final static String START_PANEL = "START_PANEL";
@@ -194,12 +195,12 @@ public class ActionField extends JPanel {
 
     private void initViews() {
         this.cards = new JPanel(new CardLayout());
-        cards.add(this, BF_PANEL);
-        cards.add(new StartGamePanel(), START_PANEL);
+        this.cards.add(this, BF_PANEL);
+        this.cards.add(new StartGamePanel(), START_PANEL);
     }
 
     void initFrame(){
-        new MainFrame(cards);
+        mainFrame = new MainFrame(cards);
     }
 
     void renderSplashScreen() throws NullPointerException{

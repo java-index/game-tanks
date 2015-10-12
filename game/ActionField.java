@@ -1,13 +1,17 @@
 package game;
 
+import com.sun.deploy.panel.SpecialTableRenderer;
 import game.bf_objects.*;
 import game.bf_objects.tanks.*;
+import game.bf_objects.tanks.Action;
+import game.view.MainFrame;
+import game.view.StartGamePanel;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 public class ActionField extends JPanel {
 
@@ -16,14 +20,19 @@ public class ActionField extends JPanel {
     private Tank deffender;
     private Tank agressor;
 
+    private JPanel cards;
+    private JPanel endGame;
+    private JPanel startGame;
+
+    final static String BF_PANEL = "BF_PANEL";
+    final static String START_PANEL = "START_PANEL";
+
     private int signX = 0;
     private int signY = 0;
 
     public void runTheGame() throws Exception {
         while (true) {
-            System.out.println("DEFFENDER");
             processAction(deffender.setUp(), deffender);
-            System.out.println("AGRESSOR");
             processAction(agressor.setUp(), agressor);
         }
     }
@@ -121,7 +130,7 @@ public class ActionField extends JPanel {
     private boolean bulletOutOfBattleField() {
         //number 10 is size bullet
         if ((bullet.getX() > -10 && bullet.getX() < bf.getBF_WIDTH()-1) &&
-            (bullet.getY() > -10 && bullet.getY() < bf.getBF_HEIGHT()-1)) {
+                (bullet.getY() > -10 && bullet.getY() < bf.getBF_HEIGHT()-1)) {
             return false;
         } else {
             return true;
@@ -135,8 +144,6 @@ public class ActionField extends JPanel {
     public int getCoordPixel(int coordQuadrant) {
         return coordQuadrant * bf.getStep();
     }
-
-    /*************/
 
     void moveToQuadrantXY(int xQuad, int yQuad, Tank t) throws Exception {
         int newX = getCoordPixel(xQuad);
@@ -171,23 +178,35 @@ public class ActionField extends JPanel {
         return (tank.getX() == newX && tank.getY() == newY);
     }
 
-    /******************/
-
     public ActionField() throws Exception {
+        renderSplashScreen();
+        initBFObjects();
+        initViews();
+        initFrame();
+    }
+
+    void initBFObjects(){
         bf = new BattleField();
         bullet = new Bullet(-100, -100, Direction.DOWN);
         deffender = new T34(0, 448, Direction.RIGHT, bf);
         agressor = new Tiger(370, 448, Direction.RIGHT, bf);
+    }
 
-        JFrame frame;
-        frame = new JFrame("** WORD OF TANKS **");
-        frame.setLocation(500, 150);
-        frame.setMinimumSize(new Dimension(576, 576 + 22));
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setBackground(new Color(255, 246, 192));
-        frame.getContentPane().add(BorderLayout.CENTER, this);
-        frame.pack();
-        frame.setVisible(true);
+    private void initViews() {
+        this.cards = new JPanel(new CardLayout());
+        cards.add(this, BF_PANEL);
+        cards.add(new StartGamePanel(), START_PANEL);
+    }
+
+    void initFrame(){
+        new MainFrame(cards);
+    }
+
+    void renderSplashScreen() throws NullPointerException{
+        SplashScreen splash = SplashScreen.getSplashScreen();
+        if (splash == null) {
+            throw new NullPointerException("SplashScreen.getSplashScreen() returned null");
+        }
     }
 
     @Override

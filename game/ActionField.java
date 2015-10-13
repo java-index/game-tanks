@@ -190,17 +190,36 @@ public class ActionField extends JPanel {
     private void startGame() {
         System.out.println("start");
 
-        selectActivePanel(BF_PANEL);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                selectActivePanel(BF_PANEL);
+            }
+        });
 
         while (true) {
             if (pause) {
-                sleep(500);
+                sleep(1000);
                 continue;
             }
             processAction(deffender.setUp(), deffender);
             processAction(agressor.setUp(), agressor);
         }
     }
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    if (pause) {
+//                        sleep(1000);
+//                        continue;
+//                    }
+//                    processAction(deffender.setUp(), deffender);
+//                    processAction(agressor.setUp(), agressor);
+//                }
+//            }
+//        }).start();
+//    }
 
     private void stopGame(){
         System.out.println("stop");
@@ -208,6 +227,7 @@ public class ActionField extends JPanel {
 
     private void pauseGame(){
         System.out.println("pause");
+        pause = !pause;
     }
 
     private void exitGame(){

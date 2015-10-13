@@ -64,6 +64,7 @@ public class MainFrame extends JFrame {
 
     public void setContentPane(JPanel panel){
         getContentPane().add(panel);
-        pack();
     }
+
+
 }

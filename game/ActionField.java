@@ -15,6 +15,7 @@ import javax.swing.*;
 public class ActionField extends JPanel {
 
     private boolean pause;
+    private boolean startGame;
 
     private BattleField bf;
     private Bullet bullet;
@@ -22,8 +23,8 @@ public class ActionField extends JPanel {
     private Tank agressor;
 
     private JPanel cards;
-    private JPanel endGame;
-    private JPanel startGame;
+    private JPanel gameOverPanel;
+    private JPanel startGamePanel;
     private MainFrame mainFrame;
 
     final static String BF_PANEL = "BF_PANEL";
@@ -189,40 +190,32 @@ public class ActionField extends JPanel {
 
     private void startGame() {
         System.out.println("start");
+        if (startGame){
+            return;
+        } else {
+            this.startGame = true;
+        }
+        selectActivePanel(BF_PANEL);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                selectActivePanel(BF_PANEL);
+                while (true) {
+                    if (pause) {
+                        sleep(1000);
+                        continue;
+                    }
+                    processAction(deffender.setUp(), deffender);
+                    processAction(agressor.setUp(), agressor);
+                }
             }
-        });
-
-        while (true) {
-            if (pause) {
-                sleep(1000);
-                continue;
-            }
-            processAction(deffender.setUp(), deffender);
-            processAction(agressor.setUp(), agressor);
-        }
+        }).start();
     }
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (true) {
-//                    if (pause) {
-//                        sleep(1000);
-//                        continue;
-//                    }
-//                    processAction(deffender.setUp(), deffender);
-//                    processAction(agressor.setUp(), agressor);
-//                }
-//            }
-//        }).start();
-//    }
 
     private void stopGame(){
         System.out.println("stop");
+        this.startGame = false;
+        selectActivePanel(START_PANEL);
     }
 
     private void pauseGame(){

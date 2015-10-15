@@ -244,11 +244,21 @@ public class ActionField extends JPanel {
         initFrame();
     }
 
-    void initBFObjects(){
+    private void initBFObjects(){
         bf = new BattleField();
+
         bullet = new Bullet(-100, -100, Direction.DOWN);
-        deffender = new T34(0, 448, Direction.RIGHT, bf);
-        agressor = new Tiger(370, 448, Direction.RIGHT, bf);
+
+        TankFactory tankFactory = new TankFactory(bf);
+        deffender = tankFactory.createTank(TypeTank.DEFFENDER);
+        agressor = tankFactory.createTank(TypeTank.AGRESSOR);
+    }
+
+    private void setTankPosition(Tank tank){
+
+
+        tank.setX();
+        tank.setY();
     }
 
     private void initViews() {
@@ -257,13 +267,13 @@ public class ActionField extends JPanel {
         this.cards.add(this, BF_PANEL);
     }
 
-    void initFrame(){
+    private void initFrame(){
         mainFrame = new MainFrame();
         mainFrame.addFrameMenuListener(new menuFrameListener());
         mainFrame.setContentPane(cards);
     }
 
-    void renderSplashScreen() throws NullPointerException{
+    private void renderSplashScreen() throws NullPointerException{
         SplashScreen splash = SplashScreen.getSplashScreen();
         if (splash == null) {
             throw new NullPointerException("SplashScreen.getSplashScreen() returned null");

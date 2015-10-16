@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class MainFrame extends JFrame {
 
@@ -66,5 +67,8 @@ public class MainFrame extends JFrame {
         getContentPane().add(panel);
     }
 
+    public void addKeyControlListener(KeyListener keyListener){
+        this.addKeyListener(keyListener);
+    }
 
 }

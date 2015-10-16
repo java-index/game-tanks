@@ -6,7 +6,7 @@ import game.bf_objects.BattleField;
 import java.awt.*;
 
 public abstract class AbstractTank implements Tank {
-    protected int speed = 10;
+    protected int speed = 20;
     protected int armor = 2;
     protected int x;
     protected int y;

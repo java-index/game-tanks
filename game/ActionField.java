@@ -9,6 +9,9 @@ import game.view.StartGamePanel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.*;
 
@@ -33,12 +36,43 @@ public class ActionField extends JPanel {
     private int signX = 0;
     private int signY = 0;
 
-    private void processAction(Action a, Tank tank) {
-        if (a == Action.MOVE) {
-            processMove(tank);
-        } else if (a == Action.FIRE) {
-            processFire(tank.fire(), tank);
-        }
+    private ConcurrentLinkedQueue<ActionEntity> ActionslinkedQueue;
+
+    private void processAction() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    ActionEntity actionEntity = getActionFromQueue();
+                    if (actionEntity == null || pause) continue;
+
+                    if (actionEntity.getAction() == Action.MOVE) {
+                        processMove(actionEntity.getTank());
+                    } else if (actionEntity.getAction() == Action.FIRE) {
+                        processFire(actionEntity.getTank());
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void pingTank(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                addActionToQueue(agressor.setUp(), agressor);
+                }
+            }
+        }).start();
+    }
+
+    private void addActionToQueue(Action action, Tank tank){
+        ActionslinkedQueue.add(new ActionEntity(tank, action));
+    }
+
+    private ActionEntity getActionFromQueue(){
+        return  ActionslinkedQueue.poll();
     }
 
     public void processMove(Tank tank) {
@@ -77,7 +111,7 @@ public class ActionField extends JPanel {
         int checkQuadratY = getCoordQuadrant(tank.getY()) + correctY;
         if (!bf.scanQuadrant(checkQuadratX, checkQuadratY).isDestroyed()) {
             System.out.println("FIRE!");
-            processFire(tank.fire(), tank);
+            processFire(tank);
         }
     }
 
@@ -85,8 +119,8 @@ public class ActionField extends JPanel {
         repaint();
     }
 
-    public void processFire(Bullet bullet, Tank bulletOwner) {
-        this.bullet = bullet;
+    public void processFire(Tank bulletOwner) {
+        this.bullet = bulletOwner.fire();
         this.bullet.setOwner(bulletOwner);
         while (!bulletOutOfBattleField()) {
             moveOneStep(bullet);
@@ -196,20 +230,8 @@ public class ActionField extends JPanel {
             this.startGame = true;
         }
         selectActivePanel(BF_PANEL);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    if (pause) {
-                        sleep(1000);
-                        continue;
-                    }
-                    processAction(deffender.setUp(), deffender);
-                    processAction(agressor.setUp(), agressor);
-                }
-            }
-        }).start();
+        pingTank();
+        processAction();
     }
 
     private void stopGame(){
@@ -242,11 +264,11 @@ public class ActionField extends JPanel {
         initBFObjects();
         initViews();
         initFrame();
+        this.ActionslinkedQueue = new ConcurrentLinkedQueue<>();
     }
 
     private void initBFObjects(){
         bf = new BattleField();
-
         bullet = new Bullet(-100, -100, Direction.DOWN);
 
         TankFactory tankFactory = new TankFactory(bf);
@@ -257,8 +279,8 @@ public class ActionField extends JPanel {
     private void setTankPosition(Tank tank){
 
 
-        tank.setX();
-        tank.setY();
+//        tank.setX();
+//        tank.setY();
     }
 
     private void initViews() {
@@ -270,6 +292,7 @@ public class ActionField extends JPanel {
     private void initFrame(){
         mainFrame = new MainFrame();
         mainFrame.addFrameMenuListener(new menuFrameListener());
+        mainFrame.addKeyControlListener(new KeyControlListener());
         mainFrame.setContentPane(cards);
     }
 
@@ -287,6 +310,62 @@ public class ActionField extends JPanel {
         deffender.draw(g);
         agressor.draw(g);
         bullet.draw(g);
+    }
+
+
+    class KeyControlListener implements KeyListener {
+
+        private boolean buttonPressed = false;
+
+        public void keyTyped(KeyEvent e){
+            System.out.println("event" + e.getKeyCode());
+        }
+
+        public void keyPressed(KeyEvent e){
+            Action action = Action.NONE;
+
+            switch(e.getKeyCode()){
+                case KeyEvent.VK_LEFT:
+                    deffender.setDirection(Direction.LEFT);
+                    action = Action.MOVE;
+                    break;
+                case KeyEvent.VK_UP:
+                    deffender.setDirection(Direction.UP);
+                    action = Action.MOVE;
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    deffender.setDirection(Direction.RIGHT);
+                    action = Action.MOVE;
+                    break;
+                case KeyEvent.VK_DOWN:
+                    deffender.setDirection(Direction.DOWN);
+                    action = Action.MOVE;
+                    break;
+            }
+            addActionToQueue(action, deffender);
+        }
+
+        public void keyReleased(KeyEvent e){
+            buttonPressed = false;
+        }
+    }
+
+    class ActionEntity{
+        private Tank tank;
+        private Action action;
+
+        public ActionEntity(Tank tank, Action action){
+            this.tank = tank;
+            this.action = action;
+        }
+
+        public Tank getTank() {
+            return tank;
+        }
+
+        public Action getAction() {
+            return action;
+        }
     }
 
     class menuFrameListener implements ActionListener{

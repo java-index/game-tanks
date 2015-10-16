@@ -2,7 +2,6 @@ package game.bf_objects.tanks;
 
 import game.*;
 import game.bf_objects.*;
-
 import java.awt.*;
 
 public class T34 extends AbstractTank {

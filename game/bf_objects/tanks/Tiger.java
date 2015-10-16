@@ -4,8 +4,11 @@ import game.*;
 import game.bf_objects.*;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Tiger extends AbstractTank {
+
+    Random rand = new Random();
 
     public Tiger(int x, int y, Direction tankDirection, BattleField bf){
         super(x, y, tankDirection, bf);
@@ -16,6 +19,6 @@ public class Tiger extends AbstractTank {
     @Override
     public Action setUp() {
         if(this.armor == 1) this.tankColor = new Color(155, 31, 0);
-        return Action.NONE;
+           return Action.MOVE;
     }
 }

@@ -1,5 +1,6 @@
 package game;
 
+import game.Factory.TankFactory;
 import game.bf_objects.*;
 import game.bf_objects.tanks.*;
 import game.bf_objects.tanks.Action;
@@ -18,11 +19,12 @@ import javax.swing.*;
 public class ActionField extends JPanel {
 
     private boolean pause;
-    private boolean startGame;
+    private volatile boolean startGame;
 
     private BattleField bf;
     private Bullet bullet;
     private Tank deffender;
+    private Tank attacker;
     private Tank agressor;
 
     private JPanel cards;
@@ -42,27 +44,50 @@ public class ActionField extends JPanel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                System.err.println("START ProcessAction");
+                while(startGame) {
                     ActionEntity actionEntity = getActionFromQueue();
-                    if (actionEntity == null || pause) continue;
-
-                    if (actionEntity.getAction() == Action.MOVE) {
-                        processMove(actionEntity.getTank());
-                    } else if (actionEntity.getAction() == Action.FIRE) {
-                        processFire(actionEntity.getTank());
+                    if (actionEntity == null || pause) {
+                        sleep(1000/60);
+                        continue;
                     }
-                }
-            }
+                    Action action = actionEntity.getAction();
+                    Tank tank = actionEntity.getTank();
+
+                    switch(action){
+                        case MOVE_LEFT:
+                            processMove(tank, Direction.LEFT);
+                            break;
+                        case MOVE_UP:
+                            processMove(tank, Direction.UP);
+                            break;
+                        case MOVE_RIGHT:
+                            processMove(tank, Direction.RIGHT);
+                            break;
+                        case MOVE_DOWN:
+                            processMove(tank, Direction.DOWN);
+                            break;
+                        case FIRE:
+                            processFire(tank);
+                        default:
+                            return;
+                    } //switch
+                 } //while
+                System.err.println("STOP ProcessAction");
+            } //run
         }).start();
     }
 
-    private void pingTank(){
+    private void pingTank(Tank tank){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true){
-                addActionToQueue(agressor.setUp(), agressor);
+                System.err.println("START Ping " + tank.getNameTank() + " tank");
+                while(startGame){
+                addActionToQueue(tank.setUp(), tank);
+                    sleep(15);
                 }
+                System.err.println("STOP Ping " + tank.getNameTank() + "  tank");
             }
         }).start();
     }
@@ -75,8 +100,14 @@ public class ActionField extends JPanel {
         return  ActionslinkedQueue.poll();
     }
 
-    public void processMove(Tank tank) {
-        moveOneStep(tank);
+    public void processMove(Tank tank, Direction dir) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                tank.setDirection(dir);
+                moveOneStep(tank);
+            }
+        }).start();
     }
 
     private void moveOneStep(Tank tank) {
@@ -111,7 +142,7 @@ public class ActionField extends JPanel {
         int checkQuadratY = getCoordQuadrant(tank.getY()) + correctY;
         if (!bf.scanQuadrant(checkQuadratX, checkQuadratY).isDestroyed()) {
             System.out.println("FIRE!");
-            processFire(tank);
+            //processFire(tank);
         }
     }
 
@@ -214,6 +245,7 @@ public class ActionField extends JPanel {
         CardLayout cl = (CardLayout)cards.getLayout();
         cl.show(cards, activePanel);
     }
+
     private void setActiveBFpanel(boolean active){
 
     }
@@ -230,7 +262,8 @@ public class ActionField extends JPanel {
             this.startGame = true;
         }
         selectActivePanel(BF_PANEL);
-        pingTank();
+        pingTank(agressor);
+        pingTank(attacker);
         processAction();
     }
 
@@ -258,7 +291,6 @@ public class ActionField extends JPanel {
     }
 
     /***** init section *****/
-
     public ActionField() throws Exception {
         renderSplashScreen();
         initBFObjects();
@@ -274,11 +306,10 @@ public class ActionField extends JPanel {
         TankFactory tankFactory = new TankFactory(bf);
         deffender = tankFactory.createTank(TypeTank.DEFFENDER);
         agressor = tankFactory.createTank(TypeTank.AGRESSOR);
+        attacker = tankFactory.createTank(TypeTank.ATTACKER);
     }
 
     private void setTankPosition(Tank tank){
-
-
 //        tank.setX();
 //        tank.setY();
     }
@@ -309,44 +340,46 @@ public class ActionField extends JPanel {
         bf.draw(g);
         deffender.draw(g);
         agressor.draw(g);
+        attacker.draw(g);
         bullet.draw(g);
     }
 
 
     class KeyControlListener implements KeyListener {
 
-        private boolean buttonPressed = false;
+        int pressedKeyCode = -1;
 
-        public void keyTyped(KeyEvent e){
-            System.out.println("event" + e.getKeyCode());
-        }
+        public void keyTyped(KeyEvent e){}
 
         public void keyPressed(KeyEvent e){
             Action action = Action.NONE;
 
             switch(e.getKeyCode()){
                 case KeyEvent.VK_LEFT:
-                    deffender.setDirection(Direction.LEFT);
-                    action = Action.MOVE;
+                    action = Action.MOVE_LEFT;
                     break;
                 case KeyEvent.VK_UP:
-                    deffender.setDirection(Direction.UP);
-                    action = Action.MOVE;
+                    action = Action.MOVE_UP;
                     break;
                 case KeyEvent.VK_RIGHT:
-                    deffender.setDirection(Direction.RIGHT);
-                    action = Action.MOVE;
+                    action = Action.MOVE_RIGHT;
                     break;
                 case KeyEvent.VK_DOWN:
-                    deffender.setDirection(Direction.DOWN);
-                    action = Action.MOVE;
+                    action = Action.MOVE_DOWN;
                     break;
+                default:
+                    return;
             }
-            addActionToQueue(action, deffender);
+
+            setAction(action, e.getKeyCode());
         }
 
         public void keyReleased(KeyEvent e){
-            buttonPressed = false;
+        }
+
+        private void setAction(Action action, int keyCode){
+            this.pressedKeyCode = keyCode;
+            addActionToQueue(action, deffender);
         }
     }
 

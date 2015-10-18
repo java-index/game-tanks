@@ -38,4 +38,6 @@ public interface Tank extends Drawable, Destroyable {
 
     public int getMovePath();
 
+    public String getNameTank();
+
 }

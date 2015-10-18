@@ -12,6 +12,12 @@ public class T34 extends AbstractTank {
 
     @Override
     public Action setUp() {
+        System.out.println("T34 fire");
         return Action.FIRE;
+    }
+
+    @Override
+    public String getNameTank() {
+        return "T34";
     }
 }

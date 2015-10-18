@@ -1,5 +1,6 @@
-package game;
+package game.Factory;
 
+import game.Direction;
 import game.bf_objects.BattleField;
 import game.bf_objects.tanks.*;
 
@@ -24,10 +25,12 @@ public class TankFactory {
             case DEFFENDER:
                 tank = createT34Tank();
                 break;
+            case ATTACKER:
+                tank = createBT7Tank();
+                break;
             default:
                 throw new IllegalArgumentException();
         }
-
         return tank;
     }
 

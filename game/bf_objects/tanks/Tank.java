@@ -34,7 +34,7 @@ public interface Tank extends Drawable, Destroyable {
 
     public Direction getDirection();
 
-    public void setDirection(Direction tankDirection);
+    public void setDirection(Action action);
 
     public int getMovePath();
 

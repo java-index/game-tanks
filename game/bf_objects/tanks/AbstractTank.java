@@ -26,9 +26,26 @@ public abstract class AbstractTank implements Tank {
         this.bf = bf;
     }
 
-    public void setDirection(Direction tankDirection) {
-        this.tankDirection = tankDirection;
+    public void setDirection(Action action) {
+
+        switch (action){
+            case MOVE_RIGHT:
+                this.tankDirection = Direction.RIGHT;
+                break;
+            case MOVE_LEFT:
+                this.tankDirection = Direction.LEFT;
+                break;
+            case MOVE_UP:
+                this.tankDirection = Direction.UP;
+                break;
+            case MOVE_DOWN:
+                this.tankDirection = Direction.DOWN;
+                break;
+            default:
+                return;
+        }
     }
+
 
     public void setSpeed(int speed) {
         this.speed = speed;

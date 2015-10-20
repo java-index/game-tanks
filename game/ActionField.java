@@ -18,6 +18,8 @@ import javax.swing.*;
 
 public class ActionField extends JPanel {
 
+    //http://habrahabr.ru/post/145433/
+
     private boolean pause;
     private volatile boolean startGame;
 
@@ -41,41 +43,45 @@ public class ActionField extends JPanel {
     private ConcurrentLinkedQueue<ActionEntity> ActionslinkedQueue;
 
     private void processAction() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.err.println("START ProcessAction");
-                while(startGame) {
-                    ActionEntity actionEntity = getActionFromQueue();
-                    if (actionEntity == null || pause) {
-                        sleep(1000/60);
-                        continue;
-                    }
-                    Action action = actionEntity.getAction();
-                    Tank tank = actionEntity.getTank();
-
-                    switch(action){
-                        case MOVE_LEFT:
-                            processMove(tank, Direction.LEFT);
-                            break;
-                        case MOVE_UP:
-                            processMove(tank, Direction.UP);
-                            break;
-                        case MOVE_RIGHT:
-                            processMove(tank, Direction.RIGHT);
-                            break;
-                        case MOVE_DOWN:
-                            processMove(tank, Direction.DOWN);
-                            break;
-                        case FIRE:
-                            processFire(tank);
-                        default:
-                            return;
-                    } //switch
-                 } //while
-                System.err.println("STOP ProcessAction");
-            } //run
-        }).start();
+        processMove(agressor);
+        processMove(attacker);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                System.err.println("START ProcessAction");
+//                while(startGame) {
+//                    ActionEntity actionEntity = getActionFromQueue();
+//                    if (actionEntity == null) {
+//                        sleep(1000/60);
+//                        System.out.println("process action pause");
+//                        continue;
+//                    }
+//                    Action action = actionEntity.getAction();
+//                    Tank tank = actionEntity.getTank();
+//                    System.err.println(tank.getNameTank());
+//
+//                    switch(action){
+//                        case MOVE_LEFT:
+//                            processMove(tank, Direction.LEFT);
+//                            break;
+//                        case MOVE_UP:
+//                            processMove(tank, Direction.UP);
+//                            break;
+//                        case MOVE_RIGHT:
+//                            processMove(tank, Direction.RIGHT);
+//                            break;
+//                        case MOVE_DOWN:
+//                            processMove(tank, Direction.DOWN);
+//                            break;
+//                        case FIRE:
+//                            processFire(tank);
+//                        default:
+//                            return;
+//                    } //switch
+//                 } //while
+//                System.err.println("STOP ProcessAction");
+//            } //run
+//        }).start();
     }
 
     private void pingTank(Tank tank){
@@ -84,8 +90,8 @@ public class ActionField extends JPanel {
             public void run() {
                 System.err.println("START Ping " + tank.getNameTank() + " tank");
                 while(startGame){
-                addActionToQueue(tank.setUp(), tank);
-                    sleep(15);
+                    addActionToQueue(tank.setUp(), tank);
+                    sleep(8);
                 }
                 System.err.println("STOP Ping " + tank.getNameTank() + "  tank");
             }
@@ -100,22 +106,24 @@ public class ActionField extends JPanel {
         return  ActionslinkedQueue.poll();
     }
 
-    public void processMove(Tank tank, Direction dir) {
+    public void processMove(Tank tank) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                tank.setDirection(dir);
-                moveOneStep(tank);
+                System.out.println("Start move " + tank.getNameTank());
+                while(startGame){
+                    moveOneStep(tank);
+                }
+                System.out.println("Stop move " + tank.getNameTank());
             }
         }).start();
     }
 
     private void moveOneStep(Tank tank) {
         createSign(tank.getDirection());
-        checkInterception(tank, signX, signY);
+        //checkInterception(tank, signX, signY);
         tank.updateX(signX);
         tank.updateY(signY);
-        repaint();
         sleep(tank.getSpeed());
     }
 
@@ -123,7 +131,6 @@ public class ActionField extends JPanel {
         createSign(bullet.getDirection());
         bullet.updateX(signX);
         bullet.updateY(signY);
-        repaint();
         sleep(bullet.getSpeed());
     }
 
@@ -146,8 +153,8 @@ public class ActionField extends JPanel {
         }
     }
 
-    public void processTurn(Tank tank) throws Exception {
-        repaint();
+    public void processTurn(Tank tank, Action action) {
+        tank.setDirection(action);
     }
 
     public void processFire(Tank bulletOwner) {
@@ -158,7 +165,6 @@ public class ActionField extends JPanel {
             if (processInterception(bulletOwner)) { // hit
                 destroy();
             }
-            repaint();
         } // while
     }
 
@@ -212,8 +218,6 @@ public class ActionField extends JPanel {
 
         while (!tankAtNewCoordinate(newX, newY, t)) {
             Direction newDirection = defineDirection(newX, newY, t);
-            //setDirection(newDirection);
-            //processMove(t);
         }
     }
 
@@ -262,8 +266,8 @@ public class ActionField extends JPanel {
             this.startGame = true;
         }
         selectActivePanel(BF_PANEL);
-        pingTank(agressor);
-        pingTank(attacker);
+        //pingTank(agressor);
+        //pingTank(attacker);
         processAction();
     }
 
@@ -271,11 +275,6 @@ public class ActionField extends JPanel {
         System.out.println("stop");
         this.startGame = false;
         selectActivePanel(START_PANEL);
-    }
-
-    private void pauseGame(){
-        System.out.println("pause");
-        pause = !pause;
     }
 
     private void exitGame(){
@@ -344,7 +343,6 @@ public class ActionField extends JPanel {
         bullet.draw(g);
     }
 
-
     class KeyControlListener implements KeyListener {
 
         int pressedKeyCode = -1;
@@ -411,9 +409,9 @@ public class ActionField extends JPanel {
                 case ("stop"):
                     stopGame();
                     break;
-                case ("pause"):
-                    pauseGame();
-                    break;
+//                case ("pause"):
+//                    pauseGame();
+//                    break;
                 case ("quit"):
                     exitGame();
             }
